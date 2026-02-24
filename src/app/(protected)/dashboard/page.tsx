@@ -7,7 +7,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import DashboardAIChat from "@/components/DashboardAIChat";
 import DashboardAIGreeting from "@/components/DashboardAIGreeting";
-import WeeklyActivityChart, { WeeklyDay } from "@/components/WeeklyActivityChart";
+import WeeklyActivityChart, {
+  WeeklyDay,
+} from "@/components/WeeklyActivityChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";

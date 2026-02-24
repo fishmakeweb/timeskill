@@ -38,7 +38,8 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
-  const habitScore = payload.find((p) => p.dataKey === "habitScore")?.value ?? 0;
+  const habitScore =
+    payload.find((p) => p.dataKey === "habitScore")?.value ?? 0;
   const waterEntry = payload.find((p) => p.dataKey === "waterPercent");
   const waterPercent = waterEntry?.value ?? 0;
   const waterMl = waterEntry?.payload?.waterMl ?? 0;
@@ -59,7 +60,9 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#38bdf8]" />
           Nước uống
         </span>
-        <span className="font-medium text-foreground">{waterPercent}% ({waterMl} ml)</span>
+        <span className="font-medium text-foreground">
+          {waterPercent}% ({waterMl} ml)
+        </span>
       </div>
       <div className="flex items-center justify-between gap-3">
         <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -77,15 +80,25 @@ interface WeeklyActivityChartProps {
   loading?: boolean;
 }
 
-export default function WeeklyActivityChart({ data, loading }: WeeklyActivityChartProps) {
+export default function WeeklyActivityChart({
+  data,
+  loading,
+}: WeeklyActivityChartProps) {
   const avgScore =
     data.length > 0
-      ? Math.round(data.reduce((s, d) => s + d.habitScore, 0) / data.filter((d) => d.habitScore > 0).length || 0)
+      ? Math.round(
+          data.reduce((s, d) => s + d.habitScore, 0) /
+            data.filter((d) => d.habitScore > 0).length || 0,
+        )
       : 0;
   const totalTasks = data.reduce((s, d) => s + d.tasksCreated, 0);
-  const avgWater = data.length > 0
-    ? Math.round(data.reduce((s, d) => s + d.waterPercent, 0) / data.filter((d) => d.waterPercent > 0).length || 0)
-    : 0;
+  const avgWater =
+    data.length > 0
+      ? Math.round(
+          data.reduce((s, d) => s + d.waterPercent, 0) /
+            data.filter((d) => d.waterPercent > 0).length || 0,
+        )
+      : 0;
 
   return (
     <Card className="col-span-full">
@@ -115,15 +128,27 @@ export default function WeeklyActivityChart({ data, loading }: WeeklyActivityCha
           <div className="h-[220px] flex items-center justify-center text-muted-foreground text-sm">
             Đang tải...
           </div>
-        ) : data.every((d) => d.habitScore === 0 && d.waterPercent === 0 && d.tasksCreated === 0) ? (
+        ) : data.every(
+            (d) =>
+              d.habitScore === 0 &&
+              d.waterPercent === 0 &&
+              d.tasksCreated === 0,
+          ) ? (
           <div className="h-[220px] flex flex-col items-center justify-center text-muted-foreground text-sm gap-2">
             <TrendingUp className="w-8 h-8 opacity-20" />
             <p>Chưa có dữ liệu — hãy bắt đầu check-in thói quen!</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={220}>
-            <ComposedChart data={data} margin={{ top: 8, right: 16, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+            <ComposedChart
+              data={data}
+              margin={{ top: 8, right: 16, left: -20, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                className="stroke-border"
+                vertical={false}
+              />
               <XAxis
                 dataKey="label"
                 tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
@@ -170,7 +195,11 @@ export default function WeeklyActivityChart({ data, loading }: WeeklyActivityCha
               />
               <Legend
                 formatter={(value) => (
-                  <span style={{ fontSize: 11, color: "var(--muted-foreground)" }}>{value}</span>
+                  <span
+                    style={{ fontSize: 11, color: "var(--muted-foreground)" }}
+                  >
+                    {value}
+                  </span>
                 )}
                 iconType="circle"
                 iconSize={8}

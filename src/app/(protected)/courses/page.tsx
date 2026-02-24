@@ -185,7 +185,15 @@ export default function CoursesPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setPredictResult(data);
+        // API returns { currentGpa, predictedGpa, difference, totalCreditsAfter }
+        // Map to state shape { currentGpa4, predictedGpa4 }
+        setPredictResult({
+          currentGpa4: data.currentGpa ?? 0,
+          predictedGpa4: data.predictedGpa ?? 0,
+        });
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error ?? "Lỗi dự đoán GPA");
       }
     } catch {
       toast.error("Lỗi dự đoán");
@@ -265,7 +273,7 @@ export default function CoursesPage() {
           </Card>
           <Card>
             <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Số tín chỉ</p>
+              <p className="text-sm text-muted-foreground">Số tín chỉ</p>
               <p className="text-3xl font-bold">{gpaData.totalCredits}</p>
               <p className="text-xs text-muted-foreground">
                 {gpaData.courseCount} môn

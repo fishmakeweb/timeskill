@@ -99,20 +99,58 @@ export default function HabitsPage() {
 
   const fetchHabits = async () => {
     const today = new Date().toISOString().split("T")[0];
-    const todayRes = await fetch(`/api/habits?date=${today}`);
+
+    // Parallel-fetch habits, water, sleep and weekly data
+    const [todayRes, waterRes, sleepRes, weekRes] = await Promise.all([
+      fetch(`/api/habits?date=${today}`),
+      fetch(`/api/water?date=${today}`),
+      fetch("/api/sleep?limit=1"),
+      fetch("/api/habits?days=7"),
+    ]);
+
+    // Base habit values from the habits collection
+    let habitData = { exercise: 0, water: 0, sleep: 0, calories: 0 };
+    let existingHabit: HabitEntry | null = null;
     if (todayRes.ok) {
       const data = await todayRes.json();
       if (data.length > 0) {
-        setTodayHabit(data[0]);
-        setFormData({
+        existingHabit = data[0];
+        habitData = {
           exercise: data[0].exercise,
           water: data[0].water,
           sleep: data[0].sleep,
           calories: data[0].calories,
-        });
+        };
       }
     }
-    const weekRes = await fetch("/api/habits?days=7");
+
+    // Sync water: override with ml → glasses from dedicated water API
+    // 250 ml ≈ 1 standard glass
+    if (waterRes.ok) {
+      const waterData = await waterRes.json();
+      if (waterData?.totalMl > 0) {
+        habitData.water = Math.round(waterData.totalMl / 250);
+      }
+    }
+
+    // Sync sleep: override with durationHours from most recent sleep log if it's from today
+    if (sleepRes.ok) {
+      const sleepLogs = await sleepRes.json();
+      if (Array.isArray(sleepLogs) && sleepLogs.length > 0) {
+        const latestLog = sleepLogs[0];
+        const logDate = new Date(latestLog.wakeTime ?? latestLog.date ?? "");
+        const todayMidnight = new Date(today);
+        const tomorrowMidnight = new Date(today);
+        tomorrowMidnight.setDate(tomorrowMidnight.getDate() + 1);
+        if (logDate >= todayMidnight && logDate < tomorrowMidnight) {
+          habitData.sleep = Math.round(latestLog.durationHours * 10) / 10;
+        }
+      }
+    }
+
+    setTodayHabit(existingHabit);
+    setFormData(habitData);
+
     if (weekRes.ok) {
       const data = await weekRes.json();
       setWeekHabits(data);

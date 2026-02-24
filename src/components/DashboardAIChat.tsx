@@ -135,7 +135,10 @@ export default function DashboardAIChat({ open, onClose, context }: Props) {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "❌ Không thể kết nối. Vui lòng thử lại." },
+        {
+          role: "assistant",
+          content: "❌ Không thể kết nối. Vui lòng thử lại.",
+        },
       ]);
     } finally {
       setLoading(false);
@@ -148,10 +151,7 @@ export default function DashboardAIChat({ open, onClose, context }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent
-        side="right"
-        className="w-full sm:w-105 p-0 flex flex-col"
-      >
+      <SheetContent side="right" className="w-full sm:w-105 p-0 flex flex-col">
         {/* Header */}
         <SheetHeader className="px-4 py-3 bg-linear-to-r from-[#6961d5] to-[#8b82e8] text-white shrink-0">
           <SheetTitle className="flex items-center gap-2 text-white text-base">
@@ -261,7 +261,9 @@ export default function DashboardAIChat({ open, onClose, context }: Props) {
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+              onKeyDown={(e) =>
+                e.key === "Enter" && !e.shiftKey && sendMessage()
+              }
               placeholder="Nhập câu hỏi..."
               disabled={loading || greetLoading}
               className="flex-1 text-sm"

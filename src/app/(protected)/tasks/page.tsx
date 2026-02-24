@@ -39,6 +39,7 @@ import {
   Flag,
 } from "lucide-react";
 import { differenceInDays } from "date-fns";
+import { createPortal } from "react-dom";
 
 type KanbanStatus = "todo" | "in-progress" | "done";
 type TaskPriority = "low" | "medium" | "high";
@@ -196,7 +197,9 @@ export default function TasksPage() {
       const body = {
         ...form,
         subtasks: aiSubtasks.map((s) => ({ title: s, completed: false })),
-        status: editTask ? normalizeStatusForApi(editTask.status) : "not-started",
+        status: editTask
+          ? normalizeStatusForApi(editTask.status)
+          : "not-started",
         completed: false,
       };
       const method = editTask ? "PUT" : "POST";
@@ -366,83 +369,88 @@ export default function TasksPage() {
                           draggableId={task._id}
                           index={index}
                         >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className={`bg-card border border-border rounded-lg p-3 shadow-sm ${snapshot.isDragging ? "shadow-lg" : ""}`}
-                            >
-                              <div className="flex items-start gap-2">
-                                <div
-                                  {...provided.dragHandleProps}
-                                  className="mt-0.5 cursor-grab"
-                                >
-                                  <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p
-                                    className={`text-sm font-medium leading-tight ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
+                          {(provided, snapshot) => {
+                            const card = (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`bg-card border border-border rounded-lg p-3 shadow-sm ${snapshot.isDragging ? "shadow-lg ring-2 ring-primary/30" : ""}`}
+                              >
+                                <div className="flex items-start gap-2">
+                                  <div
+                                    {...provided.dragHandleProps}
+                                    className="mt-0.5 cursor-grab"
                                   >
-                                    {task.title}
-                                  </p>
-                                  {task.description && (
-                                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                                      {task.description}
-                                    </p>
-                                  )}
-                                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                                    <div
-                                      className={`w-2 h-2 rounded-full ${PRIORITY_CONFIG[task.priority]?.color}`}
-                                    />
-                                    <span
-                                      className={`text-[10px] font-medium ${PRIORITY_CONFIG[task.priority]?.textColor}`}
+                                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p
+                                      className={`text-sm font-medium leading-tight ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
                                     >
-                                      {PRIORITY_CONFIG[task.priority]?.label}
-                                    </span>
-                                    {task.deadline && (
-                                      <span
-                                        className={`text-[10px] flex items-center gap-0.5 ${isUrgent(task.deadline) ? "text-red-500" : "text-muted-foreground"}`}
-                                      >
-                                        <Clock className="w-2.5 h-2.5" />
-                                        {getDeadlineText(task.deadline)}
-                                      </span>
+                                      {task.title}
+                                    </p>
+                                    {task.description && (
+                                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                        {task.description}
+                                      </p>
                                     )}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                      <div
+                                        className={`w-2 h-2 rounded-full ${PRIORITY_CONFIG[task.priority]?.color}`}
+                                      />
+                                      <span
+                                        className={`text-[10px] font-medium ${PRIORITY_CONFIG[task.priority]?.textColor}`}
+                                      >
+                                        {PRIORITY_CONFIG[task.priority]?.label}
+                                      </span>
+                                      {task.deadline && (
+                                        <span
+                                          className={`text-[10px] flex items-center gap-0.5 ${isUrgent(task.deadline) ? "text-red-500" : "text-muted-foreground"}`}
+                                        >
+                                          <Clock className="w-2.5 h-2.5" />
+                                          {getDeadlineText(task.deadline)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-1 shrink-0">
+                                    <button
+                                      onClick={() => openEdit(task)}
+                                      className="text-muted-foreground hover:text-foreground"
+                                    >
+                                      <Flag className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(task._id)}
+                                      className="text-muted-foreground hover:text-red-500"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
                                   </div>
                                 </div>
-                                <div className="flex gap-1 shrink-0">
-                                  <button
-                                    onClick={() => openEdit(task)}
-                                    className="text-muted-foreground hover:text-foreground"
-                                  >
-                                    <Flag className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDelete(task._id)}
-                                    className="text-muted-foreground hover:text-red-500"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
+                                {task.subtasks && task.subtasks.length > 0 && (
+                                  <div className="mt-2 pl-5 space-y-0.5">
+                                    {task.subtasks.slice(0, 3).map((sub, i) => (
+                                      <p
+                                        key={i}
+                                        className="text-[10px] text-muted-foreground"
+                                      >
+                                        {sub.completed ? "✓" : "○"} {sub.title}
+                                      </p>
+                                    ))}
+                                    {task.subtasks.length > 3 && (
+                                      <p className="text-[10px] text-muted-foreground">
+                                        +{task.subtasks.length - 3} bước nữa
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
                               </div>
-                              {task.subtasks && task.subtasks.length > 0 && (
-                                <div className="mt-2 pl-5 space-y-0.5">
-                                  {task.subtasks.slice(0, 3).map((sub, i) => (
-                                    <p
-                                      key={i}
-                                      className="text-[10px] text-muted-foreground"
-                                    >
-                                      {sub.completed ? "✓" : "○"} {sub.title}
-                                    </p>
-                                  ))}
-                                  {task.subtasks.length > 3 && (
-                                    <p className="text-[10px] text-muted-foreground">
-                                      +{task.subtasks.length - 3} bước nữa
-                                    </p>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                            );
+                            return snapshot.isDragging
+                              ? createPortal(card, document.body)
+                              : card;
+                          }}
                         </Draggable>
                       ))}
                       {provided.placeholder}
@@ -450,17 +458,19 @@ export default function TasksPage() {
                   )}
                 </Droppable>
 
-                <button
-                  onClick={() => {
-                    setEditTask(null);
-                    setForm(defaultForm);
-                    setAiSubtasks([]);
-                    setShowDialog(true);
-                  }}
-                  className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground py-1.5 rounded-lg hover:bg-background/60 flex items-center justify-center gap-1"
-                >
-                  <Plus className="w-3 h-3" /> Thêm
-                </button>
+                {col.id === "todo" && (
+                  <button
+                    onClick={() => {
+                      setEditTask(null);
+                      setForm(defaultForm);
+                      setAiSubtasks([]);
+                      setShowDialog(true);
+                    }}
+                    className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground py-1.5 rounded-lg hover:bg-background/60 flex items-center justify-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" /> Thêm
+                  </button>
+                )}
               </div>
             );
           })}

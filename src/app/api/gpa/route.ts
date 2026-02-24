@@ -49,7 +49,10 @@ export async function GET(req: NextRequest) {
 
     const gpa10 = calculateGPA(mapped);
     const gpa4 = parseFloat(((gpa10 / 10) * 4).toFixed(4));
-    const totalCredits = mapped.reduce((sum: number, c: any) => sum + c.credits, 0);
+    const totalCredits = mapped.reduce(
+      (sum: number, c: any) => sum + c.credits,
+      0,
+    );
     const courseCount = mapped.length;
 
     const semesters = getAllSemesters(allMapped);

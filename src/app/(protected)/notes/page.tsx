@@ -66,7 +66,13 @@ interface NoteFormProps {
   onSave: () => void;
 }
 
-function NoteForm({ form, setForm, tagInput, setTagInput, onSave }: NoteFormProps) {
+function NoteForm({
+  form,
+  setForm,
+  tagInput,
+  setTagInput,
+  onSave,
+}: NoteFormProps) {
   const addTag = () => {
     const t = tagInput.trim();
     if (t && !form.tags.includes(t) && form.tags.length < 10) {
@@ -100,7 +106,9 @@ function NoteForm({ form, setForm, tagInput, setTagInput, onSave }: NoteFormProp
       <div>
         <Label>Nội dung ghi chú (Markdown)</Label>
         <Textarea
-          placeholder={"Viết nội dung ghi chú ở đây...\n\nHỗ trợ Markdown: **bold**, *italic*, # tiêu đề..."}
+          placeholder={
+            "Viết nội dung ghi chú ở đây...\n\nHỗ trợ Markdown: **bold**, *italic*, # tiêu đề..."
+          }
           value={form.content}
           onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
           rows={10}
@@ -415,7 +423,10 @@ export default function NotesPage() {
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          aria-describedby={undefined}
+        >
           <DialogHeader>
             <DialogTitle>Tạo ghi chú mới</DialogTitle>
           </DialogHeader>
@@ -431,7 +442,10 @@ export default function NotesPage() {
 
       {/* Note Detail Dialog */}
       <Dialog open={noteDetailOpen} onOpenChange={setNoteDetailOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+        <DialogContent
+          className="max-w-3xl max-h-[90vh] overflow-y-auto"
+          aria-describedby={undefined}
+        >
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg">
@@ -503,7 +517,10 @@ export default function NotesPage() {
 
       {/* Quiz Dialog */}
       <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          aria-describedby={undefined}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-orange-500" />
