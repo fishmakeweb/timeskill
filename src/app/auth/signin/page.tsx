@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,6 @@ import {
 } from "@/components/ui/card";
 
 export default function SignInPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -38,8 +36,10 @@ export default function SignInPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push("/dashboard");
-        router.refresh();
+        // Hard redirect ensures the new session cookie is sent with the next
+        // request, avoiding the race condition where router.push() reuses the
+        // old client-side session state before the cookie propagates.
+        window.location.replace("/dashboard");
       }
     } catch (err) {
       setError("Đã xảy ra lỗi không mong muốn");

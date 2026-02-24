@@ -94,4 +94,6 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
+  // Required for Vercel/proxied deployments — trusts the x-forwarded-host header
+  trustHost: true,
 };
