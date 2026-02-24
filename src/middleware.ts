@@ -1,34 +1,5 @@
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+// This file is intentionally left empty.
+// Next.js 16 uses proxy.ts instead of middleware.ts.
+// All auth protection logic lives in src/proxy.ts.
 
-export default withAuth(
-  function middleware(req) {
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized({ token }) {
-        return !!token;
-      },
-    },
-    pages: {
-      signIn: "/auth/signin",
-    },
-  },
-);
-
-export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/habits/:path*",
-    "/tasks/:path*",
-    "/courses/:path*",
-    "/notes/:path*",
-    "/calendar/:path*",
-    "/focus/:path*",
-    "/water/:path*",
-    "/sleep/:path*",
-    "/settings/:path*",
-  ],
-};
 
