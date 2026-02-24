@@ -121,12 +121,20 @@ export default function CoursesPage() {
   }, []);
 
   const fetchAll = async () => {
-    const [coursesRes, gpaRes] = await Promise.all([
-      fetch("/api/courses"),
-      fetch("/api/gpa"),
-    ]);
-    if (coursesRes.ok) setCourses(await coursesRes.json());
-    if (gpaRes.ok) setGpaData(await gpaRes.json());
+    try {
+      const [coursesRes, gpaRes] = await Promise.all([
+        fetch("/api/courses"),
+        fetch("/api/gpa"),
+      ]);
+      if (coursesRes.status === 401 || gpaRes.status === 401) {
+        window.location.replace("/auth/signin");
+        return;
+      }
+      if (coursesRes.ok) setCourses(await coursesRes.json());
+      if (gpaRes.ok) setGpaData(await gpaRes.json());
+    } catch {
+      toast.error("Lỗi kết nối — không thể tải dữ liệu");
+    }
   };
 
   const handleSubmit = async () => {
@@ -239,7 +247,7 @@ export default function CoursesPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">GPA Hệ 4</p>
                   <p className={`text-4xl font-bold ${cls?.color}`}>
-                    {gpaData.gpa4.toFixed(2)}
+                    {(gpaData.gpa4 ?? 0).toFixed(2)}
                   </p>
                   <Badge className="mt-1 bg-[#6961d5]">{cls?.label}</Badge>
                 </div>
@@ -249,9 +257,9 @@ export default function CoursesPage() {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">GPA Hệ 4</p>
+              <p className="text-sm text-muted-foreground">GPA Hệ 10</p>
               <p className="text-3xl font-bold text-[#6961d5]">
-                {gpaData.gpa10.toFixed(2)}
+                {(gpaData.gpa10 ?? 0).toFixed(2)}
               </p>
             </CardContent>
           </Card>

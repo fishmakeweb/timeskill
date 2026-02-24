@@ -19,44 +19,51 @@ export async function GET(req: NextRequest) {
 
     const allCourses = await Course.find({ userId: session.user.id });
 
-    let gpa = 0;
     let courses = allCourses;
 
     if (semester) {
       courses = allCourses.filter((c: any) => c.semester === semester);
     }
 
-    gpa = calculateGPA(
-      courses.map((c: any) => ({
-        id: c._id.toString(),
-        userId: c.userId.toString(),
-        semester: c.semester,
-        courseName: c.courseName,
-        grade: c.grade,
-        credits: c.credits,
-        gradeScale: c.gradeScale,
-        createdAt: c.createdAt,
-      })),
-    );
+    const mapped = courses.map((c: any) => ({
+      id: c._id.toString(),
+      userId: c.userId.toString(),
+      semester: c.semester,
+      courseName: c.courseName,
+      grade: c.grade,
+      credits: c.credits,
+      gradeScale: c.gradeScale,
+      createdAt: c.createdAt,
+    }));
 
-    const semesters = getAllSemesters(
-      allCourses.map((c: any) => ({
-        id: c._id.toString(),
-        userId: c.userId.toString(),
-        semester: c.semester,
-        courseName: c.courseName,
-        grade: c.grade,
-        credits: c.credits,
-        gradeScale: c.gradeScale,
-        createdAt: c.createdAt,
-      })),
-    );
+    const allMapped = allCourses.map((c: any) => ({
+      id: c._id.toString(),
+      userId: c.userId.toString(),
+      semester: c.semester,
+      courseName: c.courseName,
+      grade: c.grade,
+      credits: c.credits,
+      gradeScale: c.gradeScale,
+      createdAt: c.createdAt,
+    }));
+
+    const gpa10 = calculateGPA(mapped);
+    const gpa4 = parseFloat(((gpa10 / 10) * 4).toFixed(4));
+    const totalCredits = mapped.reduce((sum: number, c: any) => sum + c.credits, 0);
+    const courseCount = mapped.length;
+
+    const semesters = getAllSemesters(allMapped);
 
     return NextResponse.json({
-      gpa,
+      gpa4,
+      gpa10,
+      totalCredits,
+      courseCount,
+      // legacy fields kept for backward compat
+      gpa: gpa10,
       semester: semester || "all",
       semesters,
-      totalCourses: courses.length,
+      totalCourses: courseCount,
     });
   } catch (error) {
     console.error("Calculate GPA error:", error);

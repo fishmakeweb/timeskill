@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import DashboardAIChat from "@/components/DashboardAIChat";
 import DashboardAIGreeting from "@/components/DashboardAIGreeting";
+import WeeklyActivityChart, { WeeklyDay } from "@/components/WeeklyActivityChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,8 @@ export default function DashboardPage() {
   const [waterGoal, setWaterGoal] = useState(2000);
   const [loading, setLoading] = useState(true);
   const [aiOpen, setAiOpen] = useState(false);
+  const [weeklyData, setWeeklyData] = useState<WeeklyDay[]>([]);
+  const [weeklyLoading, setWeeklyLoading] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
@@ -91,6 +94,14 @@ export default function DashboardPage() {
           }
         }),
     ]);
+
+    // Fetch weekly chart data separately so it doesn't block the main stats
+    fetch("/api/dashboard/weekly")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setWeeklyData(Array.isArray(data) ? data : []))
+      .catch(() => setWeeklyData([]))
+      .finally(() => setWeeklyLoading(false));
+
     setLoading(false);
   };
 
@@ -178,6 +189,7 @@ export default function DashboardPage() {
             <Skeleton key={i} className="h-28" />
           ))}
         </div>
+        <Skeleton className="h-64 w-full rounded-xl" />
         <div className="grid gap-6 md:grid-cols-2">
           <Skeleton className="h-48" />
           <Skeleton className="h-48" />
@@ -250,6 +262,11 @@ export default function DashboardPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Weekly Activity Chart */}
+      <div className="grid">
+        <WeeklyActivityChart data={weeklyData} loading={weeklyLoading} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

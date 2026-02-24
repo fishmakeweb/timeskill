@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BookOpen,
   Plus,
@@ -23,7 +22,6 @@ import {
   Trash2,
   Edit,
   Sparkles,
-  ChevronRight,
   Tag,
   X,
   CheckCircle2,
@@ -49,6 +47,104 @@ interface QuizQuestion {
   explanation: string;
 }
 
+interface NoteFormValues {
+  title: string;
+  content: string;
+  subject: string;
+  tags: string[];
+}
+
+// ─── Extracted top-level component ─────────────────────────────────────────
+// MUST be defined outside NotesPage so React never remounts it on re-render.
+// Defining a component inside another component's body causes it to be treated
+// as a brand-new type every render → unmount/remount → focus loss on every keystroke.
+interface NoteFormProps {
+  form: NoteFormValues;
+  setForm: React.Dispatch<React.SetStateAction<NoteFormValues>>;
+  tagInput: string;
+  setTagInput: React.Dispatch<React.SetStateAction<string>>;
+  onSave: () => void;
+}
+
+function NoteForm({ form, setForm, tagInput, setTagInput, onSave }: NoteFormProps) {
+  const addTag = () => {
+    const t = tagInput.trim();
+    if (t && !form.tags.includes(t) && form.tags.length < 10) {
+      setForm((p) => ({ ...p, tags: [...p.tags, t] }));
+      setTagInput("");
+    }
+  };
+  const removeTag = (t: string) =>
+    setForm((p) => ({ ...p, tags: p.tags.filter((x) => x !== t) }));
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Tiêu đề *</Label>
+        <Input
+          placeholder="Ví dụ: Ôn tập chương 3 - Giải tích"
+          value={form.title}
+          onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label>Môn học</Label>
+        <Input
+          placeholder="Ví dụ: Giải tích, Vật lý, Tiếng Anh..."
+          value={form.subject}
+          onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label>Nội dung ghi chú (Markdown)</Label>
+        <Textarea
+          placeholder={"Viết nội dung ghi chú ở đây...\n\nHỗ trợ Markdown: **bold**, *italic*, # tiêu đề..."}
+          value={form.content}
+          onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
+          rows={10}
+          className="mt-1 font-mono text-sm"
+        />
+      </div>
+      <div>
+        <Label>Tags</Label>
+        <div className="flex gap-2 mt-1">
+          <Input
+            placeholder="Thêm tag..."
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addTag();
+              }
+            }}
+          />
+          <Button type="button" variant="outline" onClick={addTag}>
+            +
+          </Button>
+        </div>
+        {form.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {form.tags.map((t) => (
+              <Badge key={t} variant="secondary" className="gap-1">
+                {t}
+                <button onClick={() => removeTag(t)}>
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+      <Button onClick={onSave} className="w-full">
+        💾 Lưu ghi chú
+      </Button>
+    </div>
+  );
+}
+
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,11 +160,11 @@ export default function NotesPage() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [tagInput, setTagInput] = useState("");
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<NoteFormValues>({
     title: "",
     content: "",
     subject: "",
-    tags: [] as string[],
+    tags: [],
   });
 
   const fetchNotes = useCallback(async () => {
@@ -175,18 +271,6 @@ export default function NotesPage() {
     }
   };
 
-  const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !form.tags.includes(t) && form.tags.length < 10) {
-      setForm((p) => ({ ...p, tags: [...p.tags, t] }));
-      setTagInput("");
-    }
-  };
-
-  const removeTag = (t: string) => {
-    setForm((p) => ({ ...p, tags: p.tags.filter((x) => x !== t) }));
-  };
-
   const quizScore = quizSubmitted
     ? quiz.filter((q, i) => quizAnswers[i] === q.correct).length
     : 0;
@@ -203,73 +287,6 @@ export default function NotesPage() {
       </div>
     );
   }
-
-  const NoteForm = () => (
-    <div className="space-y-4">
-      <div>
-        <Label>Tiêu đề *</Label>
-        <Input
-          placeholder="Ví dụ: Ôn tập chương 3 - Giải tích"
-          value={form.title}
-          onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label>Môn học</Label>
-        <Input
-          placeholder="Ví dụ: Giải tích, Vật lý, Tiếng Anh..."
-          value={form.subject}
-          onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label>Nội dung ghi chú (Markdown)</Label>
-        <Textarea
-          placeholder="Viết nội dung ghi chú ở đây...&#10;&#10;Hỗ trợ Markdown: **bold**, *italic*, # tiêu đề..."
-          value={form.content}
-          onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
-          rows={10}
-          className="mt-1 font-mono text-sm"
-        />
-      </div>
-      <div>
-        <Label>Tags</Label>
-        <div className="flex gap-2 mt-1">
-          <Input
-            placeholder="Thêm tag..."
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addTag();
-              }
-            }}
-          />
-          <Button type="button" variant="outline" onClick={addTag}>
-            +
-          </Button>
-        </div>
-        {form.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {form.tags.map((t) => (
-              <Badge key={t} variant="secondary" className="gap-1">
-                {t}
-                <button onClick={() => removeTag(t)}>
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-      <Button onClick={saveNote} className="w-full">
-        💾 Lưu ghi chú
-      </Button>
-    </div>
-  );
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -402,7 +419,13 @@ export default function NotesPage() {
           <DialogHeader>
             <DialogTitle>Tạo ghi chú mới</DialogTitle>
           </DialogHeader>
-          <NoteForm />
+          <NoteForm
+            form={form}
+            setForm={setForm}
+            tagInput={tagInput}
+            setTagInput={setTagInput}
+            onSave={saveNote}
+          />
         </DialogContent>
       </Dialog>
 
@@ -447,7 +470,13 @@ export default function NotesPage() {
           </DialogHeader>
 
           {editMode ? (
-            <NoteForm />
+            <NoteForm
+              form={form}
+              setForm={setForm}
+              tagInput={tagInput}
+              setTagInput={setTagInput}
+              onSave={saveNote}
+            />
           ) : (
             <div className="prose dark:prose-invert max-w-none">
               {selectedNote?.subject && (

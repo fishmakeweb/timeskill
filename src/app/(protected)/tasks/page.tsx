@@ -149,8 +149,16 @@ export default function TasksPage() {
   }, []);
 
   const fetchTasks = async () => {
-    const res = await fetch("/api/tasks");
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/tasks");
+      if (res.status === 401) {
+        window.location.replace("/auth/signin");
+        return;
+      }
+      if (!res.ok) {
+        toast.error("Không thể tải nhiệm vụ");
+        return;
+      }
       const data = await res.json();
       const normalized: TaskItem[] = data.map((t: Record<string, unknown>) => ({
         _id: (t._id || t.id) as string,
@@ -165,6 +173,8 @@ export default function TasksPage() {
         subtasks: (t.subtasks as SubTask[]) || [],
       }));
       setTasks(normalized);
+    } catch {
+      toast.error("Lỗi kết nối — không thể tải nhiệm vụ");
     }
   };
 

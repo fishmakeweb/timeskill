@@ -7,5 +7,14 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider
+      // Disable automatic refetching to prevent false "unauthenticated" flashes
+      // from network blips on Vercel serverless that cause the layout to redirect
+      refetchOnWindowFocus={false}
+      refetchInterval={0}
+    >
+      {children}
+    </SessionProvider>
+  );
 }

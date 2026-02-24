@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
@@ -14,13 +13,16 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const { status } = useSession();
-  const router = useRouter();
 
   useEffect(() => {
+    // Middleware (proxy.ts) already gates the route. This is a client-side
+    // fallback for when the JWT session actually expires mid-session.
+    // We use window.location (hard redirect) so the new request goes through
+    // middleware and gets a fresh cookie check.
     if (status === "unauthenticated") {
-      router.push("/auth/signin");
+      window.location.replace("/auth/signin");
     }
-  }, [status, router]);
+  }, [status]);
 
   if (status === "loading") {
     return (
@@ -46,6 +48,8 @@ export default function ProtectedLayout({
     );
   }
 
+  // Don't render children while unauthenticated — prevents cascading 401s
+  // from all the page's data-fetching hooks firing before the redirect lands.
   if (status === "unauthenticated") {
     return null;
   }
