@@ -104,7 +104,7 @@ function NoteForm({ form, setForm, tagInput, setTagInput, onSave }: NoteFormProp
           value={form.content}
           onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
           rows={10}
-          className="mt-1 font-mono text-sm"
+          className="mt-1 text-sm"
         />
       </div>
       <div>
@@ -484,7 +484,7 @@ export default function NotesPage() {
                   {selectedNote.subject}
                 </Badge>
               )}
-              <div className="whitespace-pre-wrap text-sm text-foreground bg-muted/30 rounded-lg p-4 font-mono">
+              <div className="whitespace-pre-wrap text-sm text-foreground bg-muted/30 rounded-lg p-4">
                 {selectedNote?.content || "Ghi chú trống"}
               </div>
               {selectedNote?.tags && selectedNote.tags.length > 0 && (
