@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import WaterLog from "@/models/WaterLog";
 import { z } from "zod";
@@ -19,7 +18,7 @@ function getTodayMidnight(dateStr?: string): Date {
 // GET /api/water?date=YYYY-MM-DD  — get water log for a specific day
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -61,7 +60,7 @@ export async function GET(req: NextRequest) {
 // POST /api/water — add water entry for today
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -111,7 +110,7 @@ export async function POST(req: NextRequest) {
 // PUT /api/water — update goal
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -149,7 +148,7 @@ export async function PUT(req: NextRequest) {
 // DELETE /api/water — remove last entry
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

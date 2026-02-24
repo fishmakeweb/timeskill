@@ -1,21 +1,8 @@
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 
-export default withAuth(
-  function proxy(req) {
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized({ token }) {
-        return !!token;
-      },
-    },
-    pages: {
-      signIn: "/auth/signin",
-    },
-  },
-);
+// Use next-auth v5's built-in middleware — supports trustHost for Vercel
+export default NextAuth(authConfig).auth;
 
 export const config = {
   matcher: [
@@ -31,3 +18,4 @@ export const config = {
     "/settings/:path*",
   ],
 };
+
