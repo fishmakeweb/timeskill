@@ -186,7 +186,7 @@ export default function WaterPage() {
               Đặt mục tiêu
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>Đặt mục tiêu nước uống</DialogTitle>
             </DialogHeader>

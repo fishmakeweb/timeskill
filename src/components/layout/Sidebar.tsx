@@ -14,10 +14,12 @@ import {
   Timer,
   Settings,
   Sparkles,
+  Activity,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/habits", icon: Activity, label: "Điều kiện" },
   { href: "/water", icon: Droplets, label: "Nước uống" },
   { href: "/sleep", icon: Moon, label: "Giấc ngủ" },
   { href: "/tasks", icon: CheckSquare, label: "Nhiệm vụ" },

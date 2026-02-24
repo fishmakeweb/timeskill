@@ -12,7 +12,7 @@ const taskSchema = z.object({
     .enum(["not-started", "in-progress", "completed", "done"])
     .optional(),
   priority: z.enum(["low", "medium", "high"]),
-  deadline: z.string(),
+  deadline: z.string().optional(),
   subtasks: z
     .array(z.object({ title: z.string(), completed: z.boolean() }))
     .optional(),
@@ -62,13 +62,25 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
+    // Validate and parse deadline if provided
+    let deadlineDate: Date | undefined;
+    if (validatedData.deadline && validatedData.deadline.trim() !== "") {
+      deadlineDate = new Date(validatedData.deadline);
+      if (isNaN(deadlineDate.getTime())) {
+        return NextResponse.json(
+          { error: "Hạn chật không hợp lệ. Vui lòng chọn ngày giờ cụ thể." },
+          { status: 400 },
+        );
+      }
+    }
+
     const task = await Task.create({
       userId: session.user.id,
       title: validatedData.title,
       description: validatedData.description || "",
       status: validatedData.status || "not-started",
       priority: validatedData.priority,
-      deadline: new Date(validatedData.deadline),
+      ...(deadlineDate ? { deadline: deadlineDate } : {}),
       subtasks: validatedData.subtasks || [],
     });
 

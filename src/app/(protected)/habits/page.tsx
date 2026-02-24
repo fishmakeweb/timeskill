@@ -30,9 +30,9 @@ const HABIT_GOALS = { exercise: 30, water: 8, sleep: 8, calories: 2000 };
 const HABIT_CONFIG = [
   {
     key: "exercise",
-    label: "Tap the duc",
+    label: "Tập thể dục",
     icon: Activity,
-    unit: "phut",
+    unit: "phút",
     goal: HABIT_GOALS.exercise,
     color: "text-orange-500",
     bg: "bg-orange-500",
@@ -40,7 +40,7 @@ const HABIT_CONFIG = [
   },
   {
     key: "water",
-    label: "Uong nuoc",
+    label: "Uống nước",
     icon: Droplets,
     unit: "ly",
     goal: HABIT_GOALS.water,
@@ -50,9 +50,9 @@ const HABIT_CONFIG = [
   },
   {
     key: "sleep",
-    label: "Giac ngu",
+    label: "Giấc ngủ",
     icon: Moon,
-    unit: "gio",
+    unit: "giờ",
     goal: HABIT_GOALS.sleep,
     color: "text-purple-500",
     bg: "bg-purple-500",
@@ -60,7 +60,7 @@ const HABIT_CONFIG = [
   },
   {
     key: "calories",
-    label: "Calo tieu thu",
+    label: "Calo tiêu thụ",
     icon: Flame,
     unit: "kcal",
     goal: HABIT_GOALS.calories,
@@ -133,11 +133,11 @@ export default function HabitsPage() {
         body: JSON.stringify({ ...formData, date: today }),
       });
       if (res.ok) {
-        toast.success("Da luu thoi quen!");
+        toast.success("Đã lưu thói quen!");
         fetchHabits();
-      } else toast.error("Loi luu du lieu");
+      } else toast.error("Lỗi lưu dữ liệu");
     } catch {
-      toast.error("Loi ket noi");
+      toast.error("Lỗi kết nối");
     } finally {
       setSaving(false);
     }
@@ -168,23 +168,23 @@ export default function HabitsPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Activity className="w-7 h-7 text-[#6961d5]" />
-            Thoi Quen Hang Ngay
+            Thói Quen Hằng Ngày
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            Theo doi suc khoe va thoi quen cua ban
+            Theo dõi sức khỏe và thói quen của bạn
           </p>
         </div>
         {streak > 0 && (
           <Badge className="bg-orange-500 gap-1">
-            <Flame className="w-3 h-3" /> {streak} ngay
+            <Flame className="w-3 h-3" /> {streak} ngày
           </Badge>
         )}
       </div>
 
       <Tabs defaultValue="today">
         <TabsList className="grid grid-cols-2 w-full max-w-xs">
-          <TabsTrigger value="today">Hom nay</TabsTrigger>
-          <TabsTrigger value="week">Tuan nay</TabsTrigger>
+          <TabsTrigger value="today">Hôm nay</TabsTrigger>
+          <TabsTrigger value="week">Tuần này</TabsTrigger>
         </TabsList>
 
         <TabsContent value="today" className="space-y-4 mt-4">
@@ -215,7 +215,7 @@ export default function HabitsPage() {
                     </div>
                     <Progress value={pct} className="h-1.5" />
                     <p className="text-xs text-muted-foreground mt-1">
-                      {pct}% muc tieu
+                      {pct}% mục tiêu
                     </p>
                   </CardContent>
                 </Card>
@@ -227,7 +227,7 @@ export default function HabitsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Zap className="w-4 h-4 text-[#6961d5]" />
-                Cap nhat hom nay
+                Cập nhật hôm nay
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -239,7 +239,7 @@ export default function HabitsPage() {
                       <Icon className={`w-4 h-4 ${h.color}`} />
                       {h.label}{" "}
                       <span className="text-muted-foreground text-xs">
-                        (muc tieu: {h.goal} {h.unit})
+                        (mục tiêu: {h.goal} {h.unit})
                       </span>
                     </Label>
                     <Input
@@ -262,15 +262,15 @@ export default function HabitsPage() {
                 className="w-full bg-[#6961d5] hover:bg-[#5a52c0]"
               >
                 {saving
-                  ? "Dang luu..."
+                  ? "Đang lưu..."
                   : todayHabit
-                    ? "Cap nhat"
-                    : "Luu hom nay"}
+                    ? "Cập nhật"
+                    : "Lưu hôm nay"}
               </Button>
               {allGoalsMet && (
                 <div className="text-center p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                    Tuyet voi! Ban da dat tat ca muc tieu hom nay!
+                    Tuyệt vời! Bạn đã đạt tất cả mục tiêu hôm nay!
                   </p>
                 </div>
               )}
@@ -284,7 +284,7 @@ export default function HabitsPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-[#6961d5]" />
-                  Nhan xet tuan nay
+                  Nhận xét tuần này
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -324,7 +324,7 @@ export default function HabitsPage() {
                     </div>
                     <Progress value={pct} className="h-1.5" />
                     <p className="text-xs text-muted-foreground mt-1">
-                      {pct}% muc tieu
+                      {pct}% mục tiêu
                     </p>
                   </CardContent>
                 </Card>
@@ -336,13 +336,13 @@ export default function HabitsPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#6961d5]" />
-                Lich su 7 ngay
+                Lịch sử 7 ngày
               </CardTitle>
             </CardHeader>
             <CardContent>
               {weekHabits.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Chua co du lieu tuan nay
+                  Chưa có dữ liệu tuần này
                 </p>
               ) : (
                 <div className="space-y-2">

@@ -72,13 +72,13 @@ export default function RegisterPage() {
           </div>
           <h1 className="text-2xl font-bold">TimeSkill</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Tro ly hoc tap thong minh
+            Trợ lý học tập thông minh
           </p>
         </div>
         <Card className="w-full">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Dang ky</CardTitle>
-            <CardDescription>Tao tai khoan moi de bat dau</CardDescription>
+            <CardTitle className="text-2xl font-bold">Đăng ký</CardTitle>
+            <CardDescription>Tạo tài khoản mới để bắt đầu</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
@@ -145,16 +145,16 @@ export default function RegisterPage() {
                 className="w-full bg-[#6961d5] hover:bg-[#5a52c0]"
                 disabled={isLoading}
               >
-                {isLoading ? "Dang dang ky..." : "Dang ky"}
+                {isLoading ? "Đang đăng ký..." : "Đăng ký"}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
-                Da co tai khoan?{" "}
+                Đã có tài khoản?{" "}
                 <Link
                   href="/auth/signin"
                   className="text-[#6961d5] font-medium hover:underline"
                 >
-                  Dang nhap
+                  Đăng nhập
                 </Link>
               </p>
             </CardFooter>

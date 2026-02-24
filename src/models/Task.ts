@@ -11,7 +11,7 @@ export interface ITask extends Document {
   description: string;
   status: "not-started" | "in-progress" | "completed" | "done";
   priority: "low" | "medium" | "high";
-  deadline: Date;
+  deadline: Date | undefined;
   subtasks: ISubTask[];
   createdAt: Date;
   completedAt?: Date;
@@ -36,7 +36,7 @@ const TaskSchema = new Schema<ITask>({
     enum: ["low", "medium", "high"],
     default: "medium",
   },
-  deadline: { type: Date, required: true },
+  deadline: { type: Date, required: false },
   subtasks: { type: [SubTaskSchema], default: [] },
   createdAt: { type: Date, default: Date.now },
   completedAt: { type: Date },

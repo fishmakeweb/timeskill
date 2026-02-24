@@ -68,30 +68,30 @@ const defaultForm = {
 const getGpaClassification = (gpa4: number) => {
   if (gpa4 >= 3.6)
     return {
-      label: "Xuat sac",
+      label: "Xuất sắc",
       color: "text-purple-600",
       bg: "bg-purple-100 dark:bg-purple-950/30",
     };
   if (gpa4 >= 3.2)
     return {
-      label: "Gioi",
+      label: "Giỏi",
       color: "text-blue-600",
       bg: "bg-blue-100 dark:bg-blue-950/30",
     };
   if (gpa4 >= 2.5)
     return {
-      label: "Kha",
+      label: "Khá",
       color: "text-green-600",
       bg: "bg-green-100 dark:bg-green-950/30",
     };
   if (gpa4 >= 2.0)
     return {
-      label: "Trung binh",
+      label: "Trung bình",
       color: "text-yellow-600",
       bg: "bg-yellow-100 dark:bg-yellow-950/30",
     };
   return {
-    label: "Yeu",
+    label: "Yếu",
     color: "text-red-600",
     bg: "bg-red-100 dark:bg-red-950/30",
   };
@@ -131,7 +131,7 @@ export default function CoursesPage() {
 
   const handleSubmit = async () => {
     if (!form.courseName.trim()) {
-      toast.error("Nhap ten mon hoc");
+      toast.error("Nhập tên môn học");
       return;
     }
     setSaving(true);
@@ -142,13 +142,13 @@ export default function CoursesPage() {
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        toast.success("Da them mon hoc!");
+        toast.success("Đã thêm môn học!");
         setShowDialog(false);
         setForm(defaultForm);
         fetchAll();
       }
     } catch {
-      toast.error("Loi luu");
+      toast.error("Lỗi lưu");
     } finally {
       setSaving(false);
     }
@@ -159,11 +159,11 @@ export default function CoursesPage() {
       () => null,
     );
     if (res?.ok) {
-      toast.success("Da xoa");
+      toast.success("Đã xóa");
       fetchAll();
     } else {
       // Try with different endpoint pattern
-      toast.error("Khong the xoa - thu lai");
+      toast.error("Không thể xóa - thử lại");
     }
   };
 
@@ -180,7 +180,7 @@ export default function CoursesPage() {
         setPredictResult(data);
       }
     } catch {
-      toast.error("Loi du doan");
+      toast.error("Lỗi dự đoán");
     } finally {
       setPredicting(false);
     }
@@ -216,17 +216,17 @@ export default function CoursesPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <GraduationCap className="w-7 h-7 text-[#6961d5]" />
-            GPA & Mon Hoc
+            GPA & Môn Học
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            Quan ly diem so va tinh GPA
+            Quản lý điểm số và tính GPA
           </p>
         </div>
         <Button
           onClick={() => setShowDialog(true)}
           className="bg-[#6961d5] hover:bg-[#5a52c0]"
         >
-          <Plus className="w-4 h-4 mr-1" /> Them mon hoc
+          <Plus className="w-4 h-4 mr-1" /> Thêm môn học
         </Button>
       </div>
 
@@ -237,7 +237,7 @@ export default function CoursesPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">GPA He 4</p>
+                  <p className="text-sm text-muted-foreground">GPA Hệ 4</p>
                   <p className={`text-4xl font-bold ${cls?.color}`}>
                     {gpaData.gpa4.toFixed(2)}
                   </p>
@@ -249,7 +249,7 @@ export default function CoursesPage() {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">GPA He 10</p>
+              <p className="text-sm text-muted-foreground">GPA Hệ 4</p>
               <p className="text-3xl font-bold text-[#6961d5]">
                 {gpaData.gpa10.toFixed(2)}
               </p>
@@ -257,10 +257,10 @@ export default function CoursesPage() {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">So tin chi</p>
+            <p className="text-sm text-muted-foreground">Số tín chỉ</p>
               <p className="text-3xl font-bold">{gpaData.totalCredits}</p>
               <p className="text-xs text-muted-foreground">
-                {gpaData.courseCount} mon
+                {gpaData.courseCount} môn
               </p>
             </CardContent>
           </Card>
@@ -269,9 +269,9 @@ export default function CoursesPage() {
 
       <Tabs defaultValue="courses">
         <TabsList className="grid grid-cols-3 w-full max-w-sm">
-          <TabsTrigger value="courses">Mon hoc</TabsTrigger>
-          <TabsTrigger value="chart">Bieu do</TabsTrigger>
-          <TabsTrigger value="predict">Du doan</TabsTrigger>
+          <TabsTrigger value="courses">Môn học</TabsTrigger>
+          <TabsTrigger value="chart">Biểu đồ</TabsTrigger>
+          <TabsTrigger value="predict">Dự đoán</TabsTrigger>
         </TabsList>
 
         {/* Courses List */}
@@ -280,13 +280,13 @@ export default function CoursesPage() {
             <Card>
               <CardContent className="py-12 text-center">
                 <BookOpen className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                <p className="text-muted-foreground">Chua co mon hoc nao</p>
+                <p className="text-muted-foreground">Chưa có môn học nào</p>
                 <Button
                   onClick={() => setShowDialog(true)}
                   className="mt-3 bg-[#6961d5] hover:bg-[#5a52c0]"
                   size="sm"
                 >
-                  Them mon hoc dau tien
+                  Thêm môn học đầu tiên
                 </Button>
               </CardContent>
             </Card>
@@ -322,7 +322,7 @@ export default function CoursesPage() {
                             {c.courseName}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {c.credits} tin chi
+                            {c.credits} tín chỉ
                           </p>
                         </div>
                         <div className="text-right">
@@ -359,13 +359,13 @@ export default function CoursesPage() {
             <CardHeader>
               <CardTitle className="text-sm flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-[#6961d5]" />
-                Bien dong GPA theo hoc ky
+                Biến động GPA theo học kỳ
               </CardTitle>
             </CardHeader>
             <CardContent>
               {chartData.length < 2 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  Can it nhat 2 hoc ky de hien thi bieu do
+                  Cần ít nhất 2 học kỳ để hiển thị biểu đồ
                 </p>
               ) : (
                 <ResponsiveContainer width="100%" height={250}>
@@ -403,13 +403,13 @@ export default function CoursesPage() {
             <CardHeader>
               <CardTitle className="text-sm flex items-center gap-2">
                 <Calculator className="w-4 h-4 text-[#6961d5]" />
-                Du doan GPA neu them mon hoc
+                Dự đoán GPA nếu thêm môn học
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <Label>Diem</Label>
+                  <Label>Điểm</Label>
                   <Input
                     type="number"
                     min={0}
@@ -426,7 +426,7 @@ export default function CoursesPage() {
                   />
                 </div>
                 <div>
-                  <Label>Tin chi</Label>
+                  <Label>Tín chỉ</Label>
                   <Input
                     type="number"
                     min={1}
@@ -442,7 +442,7 @@ export default function CoursesPage() {
                   />
                 </div>
                 <div>
-                  <Label>He so</Label>
+                  <Label>Hệ số</Label>
                   <Select
                     value={predictForm.gradeScale}
                     onValueChange={(v: "10" | "4") =>
@@ -453,8 +453,8 @@ export default function CoursesPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="10">He 10</SelectItem>
-                      <SelectItem value="4">He 4</SelectItem>
+                      <SelectItem value="10">Hệ 10</SelectItem>
+                      <SelectItem value="4">Hệ 4</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -465,14 +465,14 @@ export default function CoursesPage() {
                 disabled={predicting}
                 className="w-full bg-[#6961d5] hover:bg-[#5a52c0]"
               >
-                {predicting ? "Dang tinh..." : "Tinh GPA du doan"}
+                {predicting ? "Đang tính..." : "Tính GPA dự đoán"}
               </Button>
 
               {predictResult && (
                 <div className="p-4 bg-[#6961d5]/10 rounded-lg space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      GPA hien tai:
+                      GPA hiện tại:
                     </span>
                     <span className="font-bold">
                       {predictResult.currentGpa4.toFixed(2)}/4.0
@@ -480,7 +480,7 @@ export default function CoursesPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      GPA du doan:
+                      GPA dự đoán:
                     </span>
                     <span
                       className={`font-bold text-lg ${
@@ -494,7 +494,7 @@ export default function CoursesPage() {
                   </div>
                   <div className="flex items-center justify-between border-t pt-2">
                     <span className="text-sm text-muted-foreground">
-                      Thay doi:
+                      Thay đổi:
                     </span>
                     <Badge
                       className={
@@ -513,7 +513,7 @@ export default function CoursesPage() {
                   </div>
                   <p className="text-xs text-muted-foreground text-center mt-2">
                     {getGpaClassification(predictResult.predictedGpa4).label} -
-                    Du doan
+                    Dự đoán
                   </p>
                 </div>
               )}
@@ -524,13 +524,13 @@ export default function CoursesPage() {
 
       {/* Add Course Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle>Them mon hoc moi</DialogTitle>
+            <DialogTitle>Thêm môn học mới</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Hoc ky</Label>
+              <Label>Học kỳ</Label>
               <Input
                 value={form.semester}
                 onChange={(e) =>
@@ -541,19 +541,19 @@ export default function CoursesPage() {
               />
             </div>
             <div>
-              <Label>Ten mon hoc *</Label>
+              <Label>Tên môn học *</Label>
               <Input
                 value={form.courseName}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, courseName: e.target.value }))
                 }
-                placeholder="Giai tich, Lap trinh OOP..."
+                placeholder="Giải tích, Lập trình OOP..."
                 className="mt-1"
               />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label>Diem</Label>
+                <Label>Điểm</Label>
                 <Input
                   type="number"
                   min={0}
@@ -567,7 +567,7 @@ export default function CoursesPage() {
                 />
               </div>
               <div>
-                <Label>Tin chi</Label>
+                <Label>Tín chỉ</Label>
                 <Input
                   type="number"
                   min={1}
@@ -580,7 +580,7 @@ export default function CoursesPage() {
                 />
               </div>
               <div>
-                <Label>He so</Label>
+                <Label>Hệ số</Label>
                 <Select
                   value={form.gradeScale}
                   onValueChange={(v: "10" | "4") =>
@@ -591,8 +591,8 @@ export default function CoursesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">He 10</SelectItem>
-                    <SelectItem value="4">He 4</SelectItem>
+                    <SelectItem value="10">Hệ 10</SelectItem>
+                    <SelectItem value="4">Hệ 4</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -600,14 +600,14 @@ export default function CoursesPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDialog(false)}>
-              Huy
+              Hủy
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={saving}
               className="bg-[#6961d5] hover:bg-[#5a52c0]"
             >
-              {saving ? "Dang luu..." : "Them mon hoc"}
+              {saving ? "Đang lưu..." : "Thêm môn học"}
             </Button>
           </DialogFooter>
         </DialogContent>

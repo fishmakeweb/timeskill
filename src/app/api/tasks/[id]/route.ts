@@ -83,8 +83,16 @@ export async function PUT(
       updateData.completedAt = new Date();
     }
     if (validatedData.priority) updateData.priority = validatedData.priority;
-    if (validatedData.deadline)
-      updateData.deadline = new Date(validatedData.deadline);
+    if (validatedData.deadline) {
+      const d = new Date(validatedData.deadline);
+      if (isNaN(d.getTime())) {
+        return NextResponse.json(
+          { error: "Hạn chật không hợp lệ. Vui lòng chọn ngày giờ cụ thể." },
+          { status: 400 },
+        );
+      }
+      updateData.deadline = d;
+    }
     if (validatedData.subtasks !== undefined)
       updateData.subtasks = validatedData.subtasks;
 

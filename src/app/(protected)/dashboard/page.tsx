@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import DashboardAIChat from "@/components/DashboardAIChat";
+import DashboardAIGreeting from "@/components/DashboardAIGreeting";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import { calculateStreak } from "@/lib/habitCalculations";
 import { sortTasksByPriority } from "@/lib/taskUtils";
 import {
@@ -25,7 +26,6 @@ import {
   Sun,
   Sunset,
   Coffee,
-  Sparkles,
   ClipboardList,
 } from "lucide-react";
 
@@ -47,6 +47,7 @@ export default function DashboardPage() {
   const [waterToday, setWaterToday] = useState(0);
   const [waterGoal, setWaterGoal] = useState(2000);
   const [loading, setLoading] = useState(true);
+  const [aiOpen, setAiOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -189,35 +190,38 @@ export default function DashboardPage() {
     <div className="space-y-6 animate-fade-in-up">
       {/* Greeting Banner */}
       <Card className="border-0 bg-linear-to-r from-[#6961d5] to-[#8b82e8] text-white shadow-lg">
-        <CardContent className="py-6 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1 opacity-90">
-              <GreetIcon className="w-5 h-5" />
-              <span className="text-sm font-medium">{greetText}!</span>
+        <CardContent className="py-5 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1 opacity-90">
+                <GreetIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">{greetText}!</span>
+              </div>
+              <h1 className="text-2xl font-bold">
+                {session?.user?.name ?? "Bạn"} 👋
+              </h1>
+              <p className="text-white/80 text-sm mt-1">
+                {new Date().toLocaleDateString("vi-VN", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}
+              </p>
             </div>
-            <h1 className="text-2xl font-bold">
-              {session?.user?.name ?? "Bạn"} 👋
-            </h1>
-            <p className="text-white/80 text-sm mt-1">
-              {new Date().toLocaleDateString("vi-VN", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-              })}
-            </p>
           </div>
-          <div className="hidden sm:flex flex-col items-end gap-2">
-            <Button
-              size="sm"
-              className="bg-white/20 hover:bg-white/30 text-white border-0"
-              onClick={() => {
-                /* AI chat opens via layout */
-              }}
-            >
-              <Sparkles className="w-4 h-4 mr-1" />
-              AI Gợi Ý
-            </Button>
-          </div>
+          {/* AI greeting — auto-loads once data is ready */}
+          <DashboardAIGreeting
+            context={{
+              todayScore,
+              streak,
+              gpa,
+              pendingTasks,
+              waterPercent,
+              userName: session?.user?.name,
+            }}
+            dataLoaded={true}
+            onOpenChat={() => setAiOpen(true)}
+          />
         </CardContent>
       </Card>
 
@@ -427,6 +431,18 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+      <DashboardAIChat
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        context={{
+          todayScore,
+          streak,
+          gpa,
+          pendingTasks,
+          waterPercent,
+          userName: session?.user?.name,
+        }}
+      />
     </div>
   );
 }

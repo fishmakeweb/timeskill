@@ -57,14 +57,14 @@ export default function SignInPage() {
           </div>
           <h1 className="text-2xl font-bold">TimeSkill</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Tro ly hoc tap thong minh
+            Trợ lý học tập thông minh
           </p>
         </div>
         <Card className="w-full">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Dang nhap</CardTitle>
+            <CardTitle className="text-2xl font-bold">Đăng nhập</CardTitle>
             <CardDescription>
-              Nhap email va mat khau de tiep tuc
+              Nhập email và mật khẩu để tiếp tục
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -107,16 +107,16 @@ export default function SignInPage() {
                 className="w-full bg-[#6961d5] hover:bg-[#5a52c0]"
                 disabled={isLoading}
               >
-                {isLoading ? "Dang dang nhap..." : "Dang nhap"}
+                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
-                Chua co tai khoan?{" "}
+                Chưa có tài khoản?{" "}
                 <Link
                   href="/auth/register"
                   className="text-[#6961d5] font-medium hover:underline"
                 >
-                  Dang ky ngay
+                  Đăng ký ngay
                 </Link>
               </p>
             </CardFooter>

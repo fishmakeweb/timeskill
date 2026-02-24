@@ -398,7 +398,7 @@ export default function NotesPage() {
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Tạo ghi chú mới</DialogTitle>
           </DialogHeader>
@@ -408,7 +408,7 @@ export default function NotesPage() {
 
       {/* Note Detail Dialog */}
       <Dialog open={noteDetailOpen} onOpenChange={setNoteDetailOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg">
@@ -474,7 +474,7 @@ export default function NotesPage() {
 
       {/* Quiz Dialog */}
       <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-orange-500" />

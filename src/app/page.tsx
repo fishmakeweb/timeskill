@@ -20,57 +20,57 @@ import {
 const features = [
   {
     icon: Activity,
-    title: "Thoi quen suc khoe",
-    desc: "Theo doi tap the duc, giac ngu va dinh duong moi ngay",
+    title: "Thói quen sức khỏe",
+    desc: "Theo dõi tập thể dục, giấc ngủ và dinh dưỡng mỗi ngày",
     color: "text-orange-500",
     bg: "bg-orange-50 dark:bg-orange-950/20",
   },
   {
     icon: Droplets,
-    title: "Uong nuoc",
-    desc: "Nhac uong nuoc va theo doi tieu thu nuoc moi ngay",
+    title: "Uống nước",
+    desc: "Nhắc uống nước và theo dõi tiêu thụ nước mỗi ngày",
     color: "text-blue-500",
     bg: "bg-blue-50 dark:bg-blue-950/20",
   },
   {
     icon: Moon,
-    title: "Giac ngu",
-    desc: "Ghi log giac ngu, phan tich chat luong va xu huong",
+    title: "Giấc ngủ",
+    desc: "Ghi log giấc ngủ, phân tích chất lượng và xu hướng",
     color: "text-purple-500",
     bg: "bg-purple-50 dark:bg-purple-950/20",
   },
   {
     icon: CheckSquare,
     title: "Kanban Tasks",
-    desc: "Quan ly nhiem vu bang Kanban, AI tu dong tao buoc thuc hien",
+    desc: "Quản lý nhiệm vụ bằng Kanban, AI tự động tạo bước thực hiện",
     color: "text-green-500",
     bg: "bg-green-50 dark:bg-green-950/20",
   },
   {
     icon: GraduationCap,
     title: "GPA Tracker",
-    desc: "Tinh GPA he 4, he 10 va du doan diem so",
+    desc: "Tính GPA hệ 4, hệ 10 và dự đoán điểm số",
     color: "text-[#6961d5]",
     bg: "bg-[#6961d5]/10",
   },
   {
     icon: BookOpen,
-    title: "Ghi chu + AI Quiz",
-    desc: "Ghi chu hoc tap, AI tu dong tao cau hoi trac nghiem",
+    title: "Ghi chú + AI Quiz",
+    desc: "Ghi chú học tập, AI tự động tạo câu hỏi trắc nghiệm",
     color: "text-pink-500",
     bg: "bg-pink-50 dark:bg-pink-950/20",
   },
   {
     icon: Calendar,
-    title: "Lich",
-    desc: "Quan ly su kien, lich hoc va deadline mot cach de dang",
+    title: "Lịch",
+    desc: "Quản lý sự kiện, lịch học và deadline một cách dễ dàng",
     color: "text-yellow-500",
     bg: "bg-yellow-50 dark:bg-yellow-950/20",
   },
   {
     icon: Timer,
     title: "Focus Mode",
-    desc: "Pomodoro Timer giup ban hoc tap hieu qua hon",
+    desc: "Pomodoro Timer giúp bạn học tập hiệu quả hơn",
     color: "text-red-500",
     bg: "bg-red-50 dark:bg-red-950/20",
   },
@@ -79,23 +79,23 @@ const features = [
 const steps = [
   {
     step: "01",
-    title: "Tao tai khoan",
-    desc: "Dang ky mien phi trong 30 giay",
+    title: "Tạo tài khoản",
+    desc: "Đăng ký miễn phí trong 30 giây",
   },
   {
     step: "02",
-    title: "Thiet lap muc tieu",
-    desc: "Dat muc tieu hoc tap va suc khoe",
+    title: "Thiết lập mục tiêu",
+    desc: "Đặt mục tiêu học tập và sức khỏe",
   },
   {
     step: "03",
-    title: "Theo doi hang ngay",
-    desc: "Cap nhat thoi quen, nhiem vu moi ngay",
+    title: "Theo dõi hàng ngày",
+    desc: "Cập nhật thói quen, nhiệm vụ mỗi ngày",
   },
   {
     step: "04",
-    title: "Phat trien ban than",
-    desc: "Xem bao cao va cai thien tung ngay",
+    title: "Phát triển bản thân",
+    desc: "Xem báo cáo và cải thiện từng ngày",
   },
 ];
 
@@ -114,12 +114,12 @@ export default function Home() {
           <div className="flex gap-3">
             <Link href="/auth/signin">
               <Button variant="ghost" size="sm">
-                Dang nhap
+                Đăng nhập
               </Button>
             </Link>
             <Link href="/auth/register">
               <Button size="sm" className="bg-[#6961d5] hover:bg-[#5a52c0]">
-                Bat dau mien phi
+                Bắt đầu miễn phí
               </Button>
             </Link>
           </div>
@@ -133,15 +133,15 @@ export default function Home() {
           AI-powered Student Assistant
         </Badge>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
-          Tro ly hoc tap
+          Trợ lý học tập
           <br />
-          <span className="text-[#6961d5]">thong minh nhat</span>
+          <span className="text-[#6961d5]">thông minh nhất</span>
           <br />
-          cho sinh vien
+          cho sinh viên
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-          Quan ly thoi quen, nhiem vu, GPA va lich hoc trong mot ung dung duy
-          nhat. AI ho tro hoc tap hieu qua hon moi ngay.
+          Quản lý thói quen, nhiệm vụ, GPA và lịch học trong một ứng dụng duy
+          nhất. AI hỗ trợ học tập hiệu quả hơn mỗi ngày.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/auth/register">
@@ -149,12 +149,12 @@ export default function Home() {
               size="lg"
               className="bg-[#6961d5] hover:bg-[#5a52c0] px-8 gap-2"
             >
-              Bat dau mien phi <ArrowRight className="w-4 h-4" />
+              Bắt đầu miễn phí <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
           <Link href="/auth/signin">
             <Button size="lg" variant="outline" className="px-8">
-              Dang nhap
+              Đăng nhập
             </Button>
           </Link>
         </div>
@@ -162,11 +162,11 @@ export default function Home() {
         {/* Hero stats */}
         <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto mt-16">
           {[
-            { icon: Brain, label: "AI tich hop", color: "text-[#6961d5]" },
-            { icon: Zap, label: "8 tinh nang", color: "text-orange-500" },
+            { icon: Brain, label: "AI tích hợp", color: "text-[#6961d5]" },
+            { icon: Zap, label: "8 tính năng", color: "text-orange-500" },
             {
               icon: Trophy,
-              label: "Bam sac tien bo",
+              label: "Bám sát tiến bộ",
               color: "text-yellow-500",
             },
           ].map(({ icon: Icon, label, color }) => (
@@ -185,9 +185,9 @@ export default function Home() {
       {/* Features Grid */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-3">Moi thu ban can</h2>
+          <h2 className="text-3xl font-bold mb-3">Mọi thứ bạn cần</h2>
           <p className="text-muted-foreground">
-            8 cong cu giup ban song to chuc hon
+            8 công cụ giúp bạn sống tổ chức hơn
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -208,9 +208,9 @@ export default function Home() {
       <section className="bg-secondary/50 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Bat dau trong 4 buoc</h2>
+            <h2 className="text-3xl font-bold mb-3">Bắt đầu trong 4 bước</h2>
             <p className="text-muted-foreground">
-              Don gian, nhanh chong va hieu qua
+              Đơn giản, nhanh chóng và hiệu quả
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
@@ -231,16 +231,16 @@ export default function Home() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-xl mx-auto bg-[#6961d5] rounded-2xl p-10 text-white">
           <Sparkles className="w-10 h-10 mx-auto mb-4 opacity-80" />
-          <h2 className="text-3xl font-bold mb-3">San sang bat dau chua?</h2>
+          <h2 className="text-3xl font-bold mb-3">Sẵn sàng bắt đầu chưa?</h2>
           <p className="text-white/80 mb-6">
-            Mien phi hoan toan. Khong can the tin dung.
+            Miễn phí hoàn toàn. Không cần thẻ tín dụng.
           </p>
           <Link href="/auth/register">
             <Button
               size="lg"
               className="bg-white text-[#6961d5] hover:bg-white/90 px-8 gap-2"
             >
-              Dang ky ngay <ArrowRight className="w-4 h-4" />
+              Đăng ký ngay <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
         </div>
@@ -248,7 +248,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-border py-6 text-center text-sm text-muted-foreground">
-        <p>TimeSkill &copy; 2024 - Tro ly hoc tap thong minh cho sinh vien</p>
+        <p>TimeSkill &copy; 2024 - Trợ lý học tập thông minh cho sinh viên</p>
       </footer>
     </div>
   );

@@ -67,19 +67,19 @@ const COLUMNS: {
 }[] = [
   {
     id: "todo",
-    label: "Chua lam",
+    label: "Chưa làm",
     color: "text-slate-600",
     bg: "bg-slate-100 dark:bg-slate-800/50",
   },
   {
     id: "in-progress",
-    label: "Dang lam",
+    label: "Đang làm",
     color: "text-blue-600",
     bg: "bg-blue-50 dark:bg-blue-950/30",
   },
   {
     id: "done",
-    label: "Hoan thanh",
+    label: "Hoàn thành",
     color: "text-green-600",
     bg: "bg-green-50 dark:bg-green-950/30",
   },
@@ -91,7 +91,7 @@ const PRIORITY_CONFIG: Record<
 > = {
   high: { label: "Cao", color: "bg-red-500", textColor: "text-red-500" },
   medium: { label: "TB", color: "bg-yellow-500", textColor: "text-yellow-500" },
-  low: { label: "Thap", color: "bg-green-500", textColor: "text-green-500" },
+  low: { label: "Thấp", color: "bg-green-500", textColor: "text-green-500" },
 };
 
 const defaultForm = {
@@ -103,10 +103,10 @@ const defaultForm = {
 
 function getDeadlineText(deadline: string): string {
   const daysLeft = differenceInDays(new Date(deadline), new Date());
-  if (daysLeft < 0) return `Qua han ${Math.abs(daysLeft)} ngay`;
-  if (daysLeft === 0) return "Hom nay!";
-  if (daysLeft === 1) return "Ngay mai";
-  return `${daysLeft} ngay nua`;
+  if (daysLeft < 0) return `Quá hạn ${Math.abs(daysLeft)} ngày`;
+  if (daysLeft === 0) return "Hôm nay!";
+  if (daysLeft === 1) return "Ngày mai";
+  return `${daysLeft} ngày nữa`;
 }
 
 function isUrgent(deadline: string): boolean {
@@ -124,6 +124,15 @@ function normalizeStatus(
   if (raw === "inProgress") return "in-progress";
   if (raw === "completed") return "done";
   return "todo";
+}
+
+/** Maps UI KanbanStatus back to a DB-valid status value */
+function normalizeStatusForApi(
+  uiStatus: KanbanStatus,
+): "not-started" | "in-progress" | "done" {
+  if (uiStatus === "todo") return "not-started";
+  if (uiStatus === "done") return "done";
+  return "in-progress";
 }
 
 export default function TasksPage() {
@@ -161,15 +170,23 @@ export default function TasksPage() {
 
   const handleSubmit = async () => {
     if (!form.title.trim()) {
-      toast.error("Vui long nhap ten nhiem vu");
+      toast.error("Vui lòng nhập tên nhiệm vụ");
       return;
+    }
+    // Client-side date validation
+    if (form.deadline && form.deadline.trim() !== "") {
+      const parsed = new Date(form.deadline);
+      if (isNaN(parsed.getTime())) {
+        toast.error("Hạn chật không hợp lệ. Vui lòng chọn ngày giờ cụ thể.");
+        return;
+      }
     }
     setSaving(true);
     try {
       const body = {
         ...form,
         subtasks: aiSubtasks.map((s) => ({ title: s, completed: false })),
-        status: "todo",
+        status: editTask ? normalizeStatusForApi(editTask.status) : "not-started",
         completed: false,
       };
       const method = editTask ? "PUT" : "POST";
@@ -180,15 +197,18 @@ export default function TasksPage() {
         body: JSON.stringify(body),
       });
       if (res.ok) {
-        toast.success(editTask ? "Da cap nhat!" : "Da tao nhiem vu!");
+        toast.success(editTask ? "Đã cập nhật!" : "Đã tạo nhiệm vụ!");
         setShowDialog(false);
         setForm(defaultForm);
         setAiSubtasks([]);
         setEditTask(null);
         fetchTasks();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error ?? "Lỗi lưu nhiệm vụ");
       }
     } catch {
-      toast.error("Loi luu nhiem vu");
+      toast.error("Lỗi kết nối, vui lòng thử lại");
     } finally {
       setSaving(false);
     }
@@ -197,7 +217,7 @@ export default function TasksPage() {
   const handleDelete = async (id: string) => {
     const res = await fetch(`/api/tasks/${id}`, { method: "DELETE" });
     if (res.ok) {
-      toast.success("Da xoa");
+      toast.success("Đã xóa");
       fetchTasks();
     }
   };
@@ -205,10 +225,12 @@ export default function TasksPage() {
   const handleStatusChange = useCallback(
     async (taskId: string, newStatus: KanbanStatus) => {
       const completed = newStatus === "done";
+      // Map UI-only "todo" to DB-valid "not-started" before sending to API
+      const apiStatus = newStatus === "todo" ? "not-started" : newStatus;
       await fetch(`/api/tasks/${taskId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus, completed }),
+        body: JSON.stringify({ status: apiStatus, completed }),
       });
       setTasks((prev) =>
         prev.map((t) =>
@@ -235,7 +257,7 @@ export default function TasksPage() {
 
   const generateAISubtasks = async () => {
     if (!form.title.trim()) {
-      toast.error("Nhap ten nhiem vu truoc");
+      toast.error("Nhập tên nhiệm vụ trước");
       return;
     }
     setAiLoading(true);
@@ -250,11 +272,13 @@ export default function TasksPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setAiSubtasks(data.subtasks || []);
-        toast.success("AI da phan tich xong!");
+        setAiSubtasks(
+          (data.subtasks || []).map((s: { title: string }) => s.title),
+        );
+        toast.success("AI đã phân tích xong!");
       }
     } catch {
-      toast.error("Loi AI");
+      toast.error("Lỗi AI");
     } finally {
       setAiLoading(false);
     }
@@ -284,10 +308,10 @@ export default function TasksPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <CheckSquare className="w-7 h-7 text-[#6961d5]" />
-            Nhiem Vu
+            Nhiệm Vụ
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            {completedCount}/{tasks.length} nhiem vu hoan thanh
+            {completedCount}/{tasks.length} nhiệm vụ hoàn thành
           </p>
         </div>
         <Button
@@ -299,7 +323,7 @@ export default function TasksPage() {
           }}
           className="bg-[#6961d5] hover:bg-[#5a52c0]"
         >
-          <Plus className="w-4 h-4 mr-1" /> Them nhiem vu
+          <Plus className="w-4 h-4 mr-1" /> Thêm nhiệm vụ
         </Button>
       </div>
 
@@ -324,7 +348,7 @@ export default function TasksPage() {
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`min-h-[120px] space-y-2 transition-colors rounded-lg ${snapshot.isDraggingOver ? "bg-primary/5" : ""}`}
+                      className={`min-h-30 space-y-2 transition-colors rounded-lg ${snapshot.isDraggingOver ? "bg-primary/5" : ""}`}
                     >
                       {colTasks.map((task, index) => (
                         <Draggable
@@ -375,7 +399,7 @@ export default function TasksPage() {
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex gap-1 flex-shrink-0">
+                                <div className="flex gap-1 shrink-0">
                                   <button
                                     onClick={() => openEdit(task)}
                                     className="text-muted-foreground hover:text-foreground"
@@ -402,7 +426,7 @@ export default function TasksPage() {
                                   ))}
                                   {task.subtasks.length > 3 && (
                                     <p className="text-[10px] text-muted-foreground">
-                                      +{task.subtasks.length - 3} buoc nua
+                                      +{task.subtasks.length - 3} bước nữa
                                     </p>
                                   )}
                                 </div>
@@ -425,7 +449,7 @@ export default function TasksPage() {
                   }}
                   className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground py-1.5 rounded-lg hover:bg-background/60 flex items-center justify-center gap-1"
                 >
-                  <Plus className="w-3 h-3" /> Them
+                  <Plus className="w-3 h-3" /> Thêm
                 </button>
               </div>
             );
@@ -444,27 +468,27 @@ export default function TasksPage() {
           }
         }}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>
-              {editTask ? "Chinh sua nhiem vu" : "Tao nhiem vu moi"}
+              {editTask ? "Chỉnh sửa nhiệm vụ" : "Tạo nhiệm vụ mới"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="task-title">Ten nhiem vu *</Label>
+              <Label htmlFor="task-title">Tên nhiệm vụ *</Label>
               <Input
                 id="task-title"
                 value={form.title}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, title: e.target.value }))
                 }
-                placeholder="Hoc bai, On tap..."
+                placeholder="Học bài, Ôn tập..."
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="task-desc">Mo ta</Label>
+              <Label htmlFor="task-desc">Mô tả</Label>
               <Textarea
                 id="task-desc"
                 value={form.description}
@@ -477,7 +501,7 @@ export default function TasksPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Uu tien</Label>
+                <Label>Ưu tiên</Label>
                 <Select
                   value={form.priority}
                   onValueChange={(v: TaskPriority) =>
@@ -489,13 +513,13 @@ export default function TasksPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="high">Cao</SelectItem>
-                    <SelectItem value="medium">Trung binh</SelectItem>
-                    <SelectItem value="low">Thap</SelectItem>
+                    <SelectItem value="medium">Trung bình</SelectItem>
+                    <SelectItem value="low">Thấp</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="deadline">Han chot</Label>
+                <Label htmlFor="deadline">Hạn chót</Label>
                 <Input
                   id="deadline"
                   type="datetime-local"
@@ -510,7 +534,7 @@ export default function TasksPage() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label>Buoc thuc hien (AI)</Label>
+                <Label>Bước thực hiện (AI)</Label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -519,7 +543,7 @@ export default function TasksPage() {
                   className="h-7 text-xs gap-1"
                 >
                   <Sparkles className="w-3 h-3 text-[#6961d5]" />
-                  {aiLoading ? "Dang phan tich..." : "AI phan tich"}
+                  {aiLoading ? "Đang phân tích..." : "AI phân tích"}
                 </Button>
               </div>
               {aiSubtasks.length > 0 ? (
@@ -536,21 +560,21 @@ export default function TasksPage() {
               ) : (
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" />
-                  Bam AI de tu dong tao cac buoc thuc hien
+                  Bấm AI để tự động tạo các bước thực hiện
                 </p>
               )}
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDialog(false)}>
-              Huy
+              Hủy
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={saving}
               className="bg-[#6961d5] hover:bg-[#5a52c0]"
             >
-              {saving ? "Dang luu..." : editTask ? "Cap nhat" : "Tao nhiem vu"}
+              {saving ? "Đang lưu..." : editTask ? "Cập nhật" : "Tạo nhiệm vụ"}
             </Button>
           </DialogFooter>
         </DialogContent>
