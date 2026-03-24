@@ -12,7 +12,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { hypotheticalGrade, credits, gradeScale = "10" } = await req.json();
+    const body = await req.json();
+    const rawGrade = body?.hypotheticalGrade ?? body?.grade;
+    const grade = Number(rawGrade);
+    const credits = Number(body?.credits);
+    const gradeScale: "10" | "4" = body?.gradeScale === "4" ? "4" : "10";
+
+    if (!Number.isFinite(grade) || !Number.isFinite(credits) || credits <= 0) {
+      return NextResponse.json(
+        { error: "Dữ liệu dự đoán không hợp lệ" },
+        { status: 400 },
+      );
+    }
+
+    if (gradeScale === "10" && (grade < 0 || grade > 10)) {
+      return NextResponse.json(
+        { error: "Điểm hệ 10 phải trong khoảng 0-10" },
+        { status: 400 },
+      );
+    }
+
+    if (gradeScale === "4" && (grade < 0 || grade > 4)) {
+      return NextResponse.json(
+        { error: "Điểm hệ 4 phải trong khoảng 0-4" },
+        { status: 400 },
+      );
+    }
 
     await connectDB();
 
@@ -42,7 +67,7 @@ export async function POST(req: NextRequest) {
       userId: session.user.id,
       semester: "Dự đoán",
       courseName: "Môn giả định",
-      grade: hypotheticalGrade,
+      grade,
       credits,
       gradeScale,
       createdAt: new Date(),
