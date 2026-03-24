@@ -111,6 +111,8 @@ export default function CoursesPage() {
     gradeScale: "10" as "10" | "4",
   });
   const [predictResult, setPredictResult] = useState<{
+    currentGpa10: number;
+    predictedGpa10: number;
     currentGpa4: number;
     predictedGpa4: number;
   } | null>(null);
@@ -185,11 +187,12 @@ export default function CoursesPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        // API returns { currentGpa, predictedGpa, difference, totalCreditsAfter }
-        // Map to state shape { currentGpa4, predictedGpa4 }
+        // Prefer explicit fields to avoid scale confusion.
         setPredictResult({
-          currentGpa4: data.currentGpa ?? 0,
-          predictedGpa4: data.predictedGpa ?? 0,
+          currentGpa10: data.currentGpa10 ?? 0,
+          predictedGpa10: data.predictedGpa10 ?? 0,
+          currentGpa4: data.currentGpa4 ?? data.currentGpa ?? 0,
+          predictedGpa4: data.predictedGpa4 ?? data.predictedGpa ?? 0,
         });
       } else {
         const err = await res.json().catch(() => ({}));
@@ -429,7 +432,7 @@ export default function CoursesPage() {
                   <Input
                     type="number"
                     min={0}
-                    max={10}
+                    max={predictForm.gradeScale === "10" ? 10 : 4}
                     step={0.1}
                     value={predictForm.grade}
                     onChange={(e) =>
@@ -458,7 +461,7 @@ export default function CoursesPage() {
                   />
                 </div>
                 <div>
-                  <Label>Hệ số</Label>
+                  <Label>Thang điểm</Label>
                   <Select
                     value={predictForm.gradeScale}
                     onValueChange={(v: "10" | "4") =>
@@ -488,15 +491,29 @@ export default function CoursesPage() {
                 <div className="p-4 bg-[#6961d5]/10 rounded-lg space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      GPA hiện tại:
+                      GPA hiện tại (hệ 10):
                     </span>
                     <span className="font-bold">
-                      {predictResult.currentGpa4.toFixed(2)}/4.0
+                      {predictResult.currentGpa10.toFixed(2)}/10
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      GPA dự đoán:
+                      GPA dự đoán (hệ 10):
+                    </span>
+                    <span
+                      className={`font-bold text-lg ${
+                        predictResult.predictedGpa10 > predictResult.currentGpa10
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {predictResult.predictedGpa10.toFixed(2)}/10
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      GPA dự đoán (hệ 4):
                     </span>
                     <span
                       className={`font-bold text-lg ${

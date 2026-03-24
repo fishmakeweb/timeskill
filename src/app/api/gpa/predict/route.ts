@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Course from "@/models/Course";
+import { calculateGPA, convertGradeToScale4 } from "@/lib/gpaCalculations";
 
 // POST /api/gpa/predict — predict GPA with a hypothetical grade
 export async function POST(req: NextRequest) {
@@ -21,31 +22,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No courses found" }, { status: 400 });
     }
 
-    // Calculate current GPA (hệ 4)
-    let totalWeighted = 0;
-    let totalCredits = 0;
+    const mappedCourses = courses.map((course) => ({
+      id: course._id.toString(),
+      userId: course.userId.toString(),
+      semester: course.semester,
+      courseName: course.courseName,
+      grade: course.grade,
+      credits: course.credits,
+      gradeScale: course.gradeScale,
+      createdAt: course.createdAt,
+    }));
 
-    for (const course of courses) {
-      const grade =
-        course.gradeScale === "10" ? convertTo4(course.grade) : course.grade;
-      totalWeighted += grade * course.credits;
-      totalCredits += course.credits;
-    }
+    // Keep prediction formula consistent with /api/gpa: weighted average on 10-scale.
+    const currentGpa10 = calculateGPA(mappedCourses);
+    const currentGpa4 = parseFloat(convertGradeToScale4(currentGpa10).toFixed(4));
 
-    const currentGpa = totalCredits > 0 ? totalWeighted / totalCredits : 0;
+    const hypotheticalCourse = {
+      id: "hypothetical",
+      userId: session.user.id,
+      semester: "Dự đoán",
+      courseName: "Môn giả định",
+      grade: hypotheticalGrade,
+      credits,
+      gradeScale,
+      createdAt: new Date(),
+    };
 
-    // Add hypothetical course
-    const hypGradeOn4 =
-      gradeScale === "10" ? convertTo4(hypotheticalGrade) : hypotheticalGrade;
-    const newTotalWeighted = totalWeighted + hypGradeOn4 * credits;
-    const newTotalCredits = totalCredits + credits;
-    const predictedGpa = newTotalWeighted / newTotalCredits;
+    const predictedGpa10 = calculateGPA([...mappedCourses, hypotheticalCourse]);
+    const predictedGpa4 = parseFloat(
+      convertGradeToScale4(predictedGpa10).toFixed(4),
+    );
+
+    const totalCreditsAfter = mappedCourses.reduce((sum, c) => sum + c.credits, 0) + credits;
 
     return NextResponse.json({
-      currentGpa: Math.round(currentGpa * 100) / 100,
-      predictedGpa: Math.round(predictedGpa * 100) / 100,
-      difference: Math.round((predictedGpa - currentGpa) * 100) / 100,
-      totalCreditsAfter: newTotalCredits,
+      // Backward compatible fields (historically treated as GPA hệ 4 in UI)
+      currentGpa: Math.round(currentGpa4 * 100) / 100,
+      predictedGpa: Math.round(predictedGpa4 * 100) / 100,
+      difference: Math.round((predictedGpa4 - currentGpa4) * 100) / 100,
+      totalCreditsAfter,
+      // Explicit scale fields for reliable UI rendering
+      currentGpa4: Math.round(currentGpa4 * 100) / 100,
+      predictedGpa4: Math.round(predictedGpa4 * 100) / 100,
+      currentGpa10,
+      predictedGpa10,
+      difference10: Math.round((predictedGpa10 - currentGpa10) * 100) / 100,
     });
   } catch (error) {
     console.error("POST /api/gpa/predict error:", error);
@@ -54,17 +75,4 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
-
-function convertTo4(grade10: number): number {
-  if (grade10 >= 9.0) return 4.0;
-  if (grade10 >= 8.5) return 3.7;
-  if (grade10 >= 8.0) return 3.5;
-  if (grade10 >= 7.5) return 3.0;
-  if (grade10 >= 7.0) return 2.5;
-  if (grade10 >= 6.5) return 2.0;
-  if (grade10 >= 6.0) return 1.5;
-  if (grade10 >= 5.5) return 1.0;
-  if (grade10 >= 5.0) return 0.5;
-  return 0.0;
 }
